@@ -1,7 +1,8 @@
 class Witcher:
-    def __init__(self, name, school, health = 100):
+    def __init__(self, name, school, strength = 15, health = 100):
         self.name = name
         self.school = school
+        self.strength = strength
         self.health = health
 
 
@@ -20,7 +21,7 @@ class Witcher:
             print('Wiedźmin ginie.')
         else:
             self.health = self.health - damage
-            print(f'Wiedźmin otrzymuje {damage} punktów obrażeń.')
+            print(f'Wiedźmin otrzymuje {damage} punktów obrażeń i zostaje mu {self.health} punktów życia')
 
 
     def drink_potion(self, amount):
@@ -33,13 +34,14 @@ class Witcher:
 
     def attack(self, monster):
         print(f'Wiedźmin atakuje potwora {monster.species}')
-        print(f'{monster.species} został pokonany. Chwała Wiedźminowi!!!')
+        monster.take_damage(self.strength)
 
 
 class Monster:
-    def __init__(self, species, strength):
-        self.species = species
+    def __init__(self, strength = 10, health = 50):
+        self.species = self.__class__.__name__
         self.strength = strength
+        self.health = health
 
 
     def strike(self, witcher):
@@ -47,11 +49,39 @@ class Monster:
         witcher.take_damage(self.strength)
 
 
+    def take_damage(self, damage):
+        if self.health <= damage:
+            self.health = 0
+            print('Potwór ginie.')
+        else:
+            self.health = self.health - damage
+            print(f'Potwór otrzymuje {damage} punktów obrażeń i zostaje mu {self.health} punktów życia.')
+
+
+class Utopiec(Monster):
+    def __init__(self):
+        super().__init__()
+
+    def regenerate(self):
+        if self.health > 0:
+            self.health += 5
+            print(f'{self.species} ukrywa się w wodzie i regeneruje 5 punktów życia.')
+
+
 geralt = Witcher('Geralt', 'Wilka')
-gryf = Monster('Gryf', 40)
+utopiec = Utopiec()
 geralt.describe()
-gryf.strike(geralt)
-geralt.describe()
-geralt.attack(gryf)
+
+print('ZACZYNA SIĘ POJEDYNEK:')
+
+while geralt.health > 0 and utopiec.health > 0:
+    utopiec.strike(geralt)
+    geralt.attack(utopiec)
+    utopiec.regenerate()
+    print()
+
+if geralt.health > 0:
+    print(f'Pojedynek wygrał Geralt i zostało mu {geralt.health} punktów życia')
+
 geralt.drink_potion(50)
 geralt.describe()
