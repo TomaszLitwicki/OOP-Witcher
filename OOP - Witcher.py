@@ -1,9 +1,31 @@
+import random
+
+
+class Bone:
+    def __init__(self, name):
+        self.name : str = name
+        self.k = int(self.name.removeprefix('k'))
+
+    def throw(self):
+        self.result = random.randrange(self.k) + 1
+
+        match self.result:
+            case 1 :
+                a = 'oczko'
+            case x if x in range (2, 5) :
+                a = 'oczka'
+            case _ :
+                a = 'oczek'
+
+        print(f'Rzut kością {self.name} - wylosowano {self.result} {a}.')
+
 class Witcher:
     def __init__(self, name, school, strength = 15, health = 100):
         self.name = name
         self.school = school
         self.strength = strength
         self.health = health
+        self.dice = Bone('k10')
 
 
     def describe(self):
@@ -34,25 +56,28 @@ class Witcher:
 
     def attack(self, monster):
         print(f'Wiedźmin atakuje potwora {monster.species}')
-        monster.take_damage(self.strength)
+        self.dice.throw()
+        monster.take_damage(self.strength + self.dice.result)
 
 
 class Monster:
-    def __init__(self, strength = 10, health = 50):
+    def __init__(self, strength = 10, health = 50 ):
         self.species = self.__class__.__name__
         self.strength = strength
         self.health = health
+        self.dice = Bone('k6')
 
 
     def strike(self, witcher):
         print(f'{self.species} atakuje {witcher.name}\'a')
-        witcher.take_damage(self.strength)
+        self.dice.throw()
+        witcher.take_damage(self.strength + self.dice.result)
 
 
     def take_damage(self, damage):
         if self.health <= damage:
             self.health = 0
-            print('Potwór ginie.')
+            print(f'Potwór otrzymuje {damage} punktów obrażeń i ginie.')
         else:
             self.health = self.health - damage
             print(f'Potwór otrzymuje {damage} punktów obrażeń i zostaje mu {self.health} punktów życia.')
@@ -67,21 +92,24 @@ class Utopiec(Monster):
             self.health += 5
             print(f'{self.species} ukrywa się w wodzie i regeneruje 5 punktów życia.')
 
-
-geralt = Witcher('Geralt', 'Wilka')
-utopiec = Utopiec()
-geralt.describe()
-
-print('ZACZYNA SIĘ POJEDYNEK:')
-
-while geralt.health > 0 and utopiec.health > 0:
-    utopiec.strike(geralt)
-    geralt.attack(utopiec)
-    utopiec.regenerate()
+if __name__ == '__main__':
+    geralt = Witcher('Geralt', 'Wilka')
+    utopiec = Utopiec()
+    geralt.describe()
+    print()
+    print('Gdzieś na wiedźmińskim szlaku Geralt napotyka na swojego pierwszego potwora... jest to UTOPIEC!')
+    print()
+    print('ZACZYNA SIĘ POJEDYNEK:')
     print()
 
-if geralt.health > 0:
-    print(f'Pojedynek wygrał Geralt i zostało mu {geralt.health} punktów życia')
+    while geralt.health > 0 and utopiec.health > 0:
+        utopiec.strike(geralt)
+        geralt.attack(utopiec)
+        utopiec.regenerate()
+        print()
 
-geralt.drink_potion(50)
-geralt.describe()
+    if geralt.health > 0:
+        print(f'Pojedynek wygrał Geralt i zostało mu {geralt.health} punktów życia')
+
+    geralt.drink_potion(50)
+    geralt.describe()
