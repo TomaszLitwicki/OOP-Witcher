@@ -1,58 +1,70 @@
 import tkinter as tk
 from tkinter import messagebox
 
+class Wiedzmin:
+    def __init__(self, plansza, start_x, start_y):
+        self.plansza = plansza
+        self.punkty_ruchu = 3
+
+        self.postac = plansza.create_oval(start_x - 10, start_y - 10, start_x + 10, start_y + 10, fill='red')
+
+    def wykonaj_krok(self, kierunek):
+        krok = 20
+        x1, y1, x2, y2 = self.plansza.coords(self.postac)
+
+        if self.punkty_ruchu > 0:
+            if kierunek == "Up" and y1 - krok >= 10:
+                self.plansza.move(self.postac, 0, -krok)
+                self.punkty_ruchu -= 1
+            elif kierunek == "Down" and y2 + krok <= 390:
+                self.plansza.move(self.postac, 0, krok)
+                self.punkty_ruchu -= 1
+            elif kierunek == "Left" and x1 - krok >= 10:
+                self.plansza.move(self.postac, -krok, 0)
+                self.punkty_ruchu -= 1
+            elif kierunek == "Right" and x2 + krok <= 390:
+                self.plansza.move(self.postac, krok, 0)
+                self.punkty_ruchu -= 1
+            else:
+                messagebox.showwarning("Krawędź!", "Dalej nie przejdziesz, zawracaj...")
+        else:
+            messagebox.showinfo("KONIEC RUCHU", "Nie masz już więcej ruchu, zakończ rundę.")
+
 root = tk.Tk()
 root.title("Ruch po mapie")
 root.resizable(False, False)
 
+etykieta_pr = tk.Label(root, text = "TWOJA RUNDA - Punkty ruchu: 3", font=("Arial", 12, "bold"))
+etykieta_pr.pack(pady=5)
 plansza = tk.Canvas(root, width=400, height=400, bg ="black")
 plansza.pack()
 
-x, y = 200, 200
-postac = plansza.create_oval(x - 10, y - 10, x + 10, y + 10, fill='red')
-punkty_ruchu = 3
+geralt = Wiedzmin(plansza, 200, 200)
 
+def nasluchuj_klawiszy(event):
+    geralt.wykonaj_krok(event.keysym)
+    etykieta_pr.config(text=f"TWOJA RUNDA - Punkty ruchu: {geralt.punkty_ruchu}")
 
-def ruch(event):
-    global punkty_ruchu
-    krok = 20
-    x1, y1, x2, y2 = plansza.coords(postac)
-
-    if punkty_ruchu > 0:
-        if event.keysym == "Up" and y1 - krok >= 10 :
-            plansza.move(postac, 0, -krok)
-            punkty_ruchu -= 1
-        elif event.keysym == "Down" and y2 + krok <= 390:
-            plansza.move(postac, 0, krok)
-            punkty_ruchu -= 1
-        elif event.keysym == "Left" and x1 - krok >= 10:
-            plansza.move(postac, -krok, 0)
-            punkty_ruchu -= 1
-        elif event.keysym == "Right" and x2 + krok <= 390:
-            plansza.move(postac, krok, 0)
-            punkty_ruchu -= 1
-        else:
-            messagebox.showwarning("Krawędź!", "Dalej nie przejdziesz, zawracaj...")
-    else:
-        messagebox.showinfo("KONIEC RUCHU", "Nie masz już więcej ruchu, zakończ rundę.")
-
-def koniec_tury():
-    global punkty_ruchu
+def koniec_tury(event = None):
     decyzja = messagebox.askyesno("Koniec tury", "Czy chcesz zakończyć turę?")
     if decyzja:
         # Logika ruchu potwora
-        punkty_ruchu = 3
+        geralt.punkty_ruchu = 3
         print("Tura potwora zakończona, Twój ruch!")
+        etykieta_pr.config(text=f"TWOJA RUNDA - Punkty ruchu: {geralt.punkty_ruchu}")
 
-def koniec_gry():
+def koniec_gry(event = None):
     decyzja = messagebox.askyesno("Koniec gry", "Czy chcesz zakończyć grę i wyjść z programu?")
     if decyzja:
         root.destroy()
 
-root.bind("<KeyPress-Up>", ruch)
-root.bind("<KeyPress-Down>", ruch)
-root.bind("<KeyPress-Left>", ruch)
-root.bind("<KeyPress-Right>", ruch)
+
+root.bind("<KeyPress-Up>", nasluchuj_klawiszy)
+root.bind("<KeyPress-Down>", nasluchuj_klawiszy)
+root.bind("<KeyPress-Left>", nasluchuj_klawiszy)
+root.bind("<KeyPress-Right>", nasluchuj_klawiszy)
+root.bind("<KeyPress-r>", koniec_tury)
+root.bind("<Escape>", koniec_gry)
 
 
 tk.Button(root, text="RUNDA", command=koniec_tury).pack(side=tk.LEFT, pady=5, padx=10)
