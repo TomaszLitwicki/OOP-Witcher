@@ -3,6 +3,7 @@ import random
 
 class Bone:
     def __init__(self, name):
+        self.result = None
         self.name : str = name
         self.k = int(self.name.removeprefix('k'))
 
@@ -111,5 +112,6 @@ if __name__ == '__main__':
     if geralt.health > 0:
         print(f'Pojedynek wygrał Geralt i zostało mu {geralt.health} punktów życia')
 
-    geralt.drink_potion(50)
-    geralt.describe()
+        geralt.drink_potion(50)
+        geralt.describe()
+
