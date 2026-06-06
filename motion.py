@@ -36,8 +36,19 @@ root.resizable(False, False)
 
 etykieta_pr = tk.Label(root, text = "TWOJA RUNDA - Punkty ruchu: 3", font=("Arial", 12, "bold"))
 etykieta_pr.pack(pady=5)
-plansza = tk.Canvas(root, width=400, height=400, bg ="black")
+
+rozmiar_planszy = 400
+skok = 20
+plansza = tk.Canvas(root, width=rozmiar_planszy, height=rozmiar_planszy, bg ="black")
 plansza.pack()
+
+def rysuj_siatke(plansza, skok, rozmiar_planszy):
+    for i in range (int(0+skok/2), rozmiar_planszy, skok):
+        plansza.create_line(i, 0, i, rozmiar_planszy, fill="gray15")
+    for i in range (int(0+skok/2), rozmiar_planszy, skok):
+        plansza.create_line(0, i, rozmiar_planszy, i, fill="gray15")
+rysuj_siatke(plansza,skok,rozmiar_planszy)
+
 
 geralt = Wiedzmin(plansza, 200, 200)
 
